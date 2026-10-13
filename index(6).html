@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12203A">
+<title>Ajudante de Publicações</title>
+<style>
+:root{--ink:#12203A;--paper:#F3F5F9;--card:#fff;--sun:#F4A300;--mute:#5B6578;--line:#DDE2EC;--ok:#17915F;--bad:#D14343;--blue:#2F5BEA}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper)}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);font-size:15px;line-height:1.4;padding-bottom:92px;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.top{background:var(--ink);color:#fff;padding:18px 16px 20px;display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;z-index:5}
+.top h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.top p{margin:4px 0 0;color:#B9C3D9;font-size:13px}
+.ic{background:transparent;border:0;padding:8px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.top .ic{color:#fff;background:rgba(255,255,255,.1)}
+.wrap{padding:14px 14px 0;max-width:640px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:16px;font-weight:700}
+.sec{font-size:13px;font-weight:700;color:var(--mute);margin:18px 2px 8px}
+.row{display:flex;gap:8px;align-items:center}
+.sp{justify-content:space-between}
+.wrapx{flex-wrap:wrap}
+.mute{color:var(--mute);font-size:13px}
+.btn{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:11px 14px;font-weight:650;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink);min-height:44px}
+.btn.p{background:var(--sun);border-color:var(--sun)}
+.btn.d{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.sm{padding:7px 10px;min-height:36px;font-size:13px;border-radius:10px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.fl{display:block;margin-bottom:10px}
+.fl>span{display:block;font-size:13px;font-weight:650;margin-bottom:4px}
+.in{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;min-height:44px}
+textarea.in{resize:vertical}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;min-height:36px}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.sun{background:var(--sun);border-color:var(--sun);color:var(--ink)}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+.tab{background:transparent;border:0;padding:9px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;font-weight:650;color:var(--mute);cursor:pointer;position:relative}
+.tab.on{color:var(--ink)}
+.tab.on::before{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;background:var(--sun);border-radius:0 0 3px 3px}
+.badge{position:absolute;top:4px;left:calc(50% + 8px);background:var(--bad);color:#fff;border-radius:999px;font-size:10.5px;min-width:17px;height:17px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.stat span{font-size:12px;color:var(--mute)}
+.post{display:grid;grid-template-columns:62px 1fr;gap:12px;background:#fff;border:1px solid var(--line);border-left:5px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.post.due{border-left-color:var(--sun)}
+.post.late{border-left-color:var(--bad)}
+.hr{font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.hr small{display:block;font-size:11.5px;font-weight:650;color:var(--mute);margin-top:5px;letter-spacing:0}
+.pv{background:var(--paper);border-radius:10px;padding:9px 10px;margin:8px 0;font-size:13.5px;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.pv.open{display:block;-webkit-line-clamp:unset}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px;background:var(--paper);color:var(--mute)}
+.tag.s{background:#FFF1CF;color:#6B4700}.tag.r{background:#FBE0E0;color:#8E2020}.tag.g{background:#D9F2E7;color:#0D5C3B}
+.ov{position:fixed;inset:0;background:rgba(18,32,58,.55);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--paper);width:100%;max-width:640px;max-height:92vh;border-radius:18px 18px 0 0;display:flex;flex-direction:column}
+.sh-h{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);font-size:17px}
+.sh-b{padding:14px;overflow:auto;-webkit-overflow-scrolling:touch}
+.warn{background:#FFF4D6;border:1px solid #F1D48A;color:#5B4300;border-radius:10px;padding:9px 11px;font-size:13px;margin-bottom:8px;display:flex;gap:8px}
+.warn svg{flex:none}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;z-index:30;font-size:14px;max-width:90vw;text-align:center}
+.bar{height:8px;background:var(--paper);border-radius:6px;overflow:hidden;margin-top:6px}
+.bar>i{display:block;height:100%;background:var(--sun)}
+.cnt{display:flex;align-items:center;gap:6px}
+.cnt button{width:36px;height:36px;border-radius:9px;border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cnt b{min-width:24px;text-align:center}
+.gsel{display:flex;align-items:center;gap:10px;padding:10px;border:1.5px solid var(--line);border-radius:10px;background:#fff;margin-bottom:6px;cursor:pointer;width:100%;text-align:left}
+.gsel.on{border-color:var(--ink);background:#EEF1F8}
+.box{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.gsel.on .box{background:var(--ink);border-color:var(--ink);color:#fff}
+.empty{text-align:center;padding:26px 16px;color:var(--mute)}
+.empty b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+.fly{width:100%;border-radius:12px;border:1px solid var(--line);display:block}
+@media (prefers-reduced-motion:no-preference){.btn,.chip,.tab{transition:background .15s,border-color .15s}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="sheet"></div>
+<div id="toast" class="toast" role="status" style="display:none"></div>
+<script>
+"use strict";
+/* ===== Ajudante de Publicações — versão leve, sem bibliotecas externas ===== */
+const KEY = "ajudante-v2";
+const $ = (s) => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const pad = (n) => String(n).padStart(2, "0");
+const toISO = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+const dayKey = (d) => toISO(d).slice(0, 10);
+const DIAS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const fmtDay = (d) => DIAS[d.getDay()] + ", " + d.getDate() + "/" + (d.getMonth() + 1);
+const fmtTime = (d) => pad(d.getHours()) + ":" + pad(d.getMinutes());
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const byWhen = (a, b) => (a.when < b.when ? -1 : a.when > b.when ? 1 : 0);
+const normUrl = (u) => { u = String(u || "").trim(); return !u ? "" : /^https?:\/\//i.test(u) ? u : "https://" + u; };
+
+function waLink(num) {
+  let n = String(num || "").replace(/\D/g, "");
+  if (n.length === 9 && n.charAt(0) === "9") n = "244" + n;
+  return n ? "https://wa.me/" + n : "";
+}
+
+function copyText(t) {
+  return new Promise((res) => {
+    const fallback = () => {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta); res(ok);
+      } catch (e) { res(false); }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => res(true), fallback);
+    else fallback();
+  });
+}
+
+/* ===== ícones ===== */
+const P = {
+  Send: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
+  Sparkles: '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/>',
+  Users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  Cal: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/>',
+  Chart: '<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
+  Copy: '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  Ext: '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+  Check: '<path d="M20 6 9 17l-5-5"/>',
+  Plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  Minus: '<path d="M5 12h14"/>',
+  Trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/>',
+  Gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  Clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  X: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  Img: '<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/>',
+  Warn: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  Down: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+  Pen: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+};
+const ic = (n, s) => '<svg width="' + (s || 20) + '" height="' + (s || 20) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + P[n] + "</svg>";
+
+/* ===== dados ===== */
+const TIPOS = [
+  ["servico", "Serviço", "Peça já o seu orçamento"],
+  ["produto", "Produto / loja", "Faça já o seu pedido"],
+  ["comida", "Restaurante / comida", "Faça o seu pedido agora"],
+  ["vaga", "Vaga / emprego", "Envie já o seu currículo"],
+  ["imovel", "Imóveis / arrendamento", "Marque já a sua visita"],
+  ["digital", "Serviço digital", "Peça uma demonstração"],
+  ["outro", "Outro", "Envie mensagem agora"],
+];
+const TONS = ["Popular e próximo", "Profissional", "Urgente"];
+const HORAS = ["07:30", "12:30", "18:30", "20:00"];
+const THEMES = [
+  { n: "Azul", bg: "#12203A", fg: "#FFFFFF", ac: "#F4A300", acfg: "#12203A" },
+  { n: "Preto", bg: "#151515", fg: "#FFFFFF", ac: "#F4A300", acfg: "#151515" },
+  { n: "Verde", bg: "#0E5A43", fg: "#FFFFFF", ac: "#FFD84D", acfg: "#0E3A2B" },
+  { n: "Vermelho", bg: "#B3261E", fg: "#FFFFFF", ac: "#FFFFFF", acfg: "#B3261E" },
+];
+const initState = () => ({ settings: { negocio: "", whatsapp: "", cidade: "Luanda", cooldownDias: 3 }, campaigns: [], groups: [], items: [] });
+const novaCampanha = () => ({ id: uid(), nome: "", tipo: "servico", descricao: "", preco: "", promo: "", tom: TONS[0], incWpp: true, incCidade: true, texts: [] });
+
+let S = (function () {
+  const base = initState();
+  try {
+    const r = localStorage.getItem(KEY);
+    if (r) { const o = JSON.parse(r); base.settings = Object.assign(base.settings, o.settings || {}); ["campaigns", "groups", "items"].forEach((k) => { if (Array.isArray(o[k])) base[k] = o[k]; }); }
+  } catch (e) { /* começa vazio */ }
+  return base;
+})();
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* sem espaço */ } };
+
+const ui = { tab: "hoje", sel: S.campaigns[0] ? S.campaigns[0].id : null, sheet: null, filtro: "pendente", editG: null, editI: null, bulk: false, flyOpen: false, fly: { titulo: "", sub: "", preco: "", tema: 0 }, prog: null, reset: false };
+const C = (id) => S.campaigns.find((x) => x.id === id);
+const G = (id) => S.groups.find((x) => x.id === id);
+const I = (id) => S.items.find((x) => x.id === id);
+
+/* ===== gerador de textos ===== */
+function rodape(c) {
+  const p = [], l = waLink(S.settings.whatsapp);
+  if (c.incWpp !== false && l) p.push("📲 WhatsApp: " + l);
+  if (c.incCidade && S.settings.cidade) p.push("📍 " + S.settings.cidade);
+  return p.length ? "\n\n" + p.join("\n") : "";
+}
+
+function gerarTextos(c) {
+  const n = c.nome.trim();
+  const tp = TIPOS.find((t) => t[0] === c.tipo) || TIPOS[6];
+  const d = (c.descricao || "").trim();
+  const pr = c.promo ? "🔥 " + c.promo : "";
+  const p = c.preco ? "💰 Preço: " + c.preco : "";
+  const ab = {
+    "Popular e próximo": ["📢 Precisa de " + n + "?", "Está à procura de " + n + "? Chegou ao sítio certo 👇", "🔥 Atenção! " + n, "👉 " + n + ": resolva hoje mesmo", "💬 " + n + ". Muitos clientes já confiam em nós", "✅ " + n + " com qualidade e rapidez"],
+    "Profissional": [n, "Apresentamos: " + n, n + ": qualidade e compromisso", "Precisa de " + n + "? Podemos ajudar.", "Atendimento profissional: " + n, n + " com atendimento dedicado"],
+    "Urgente": ["⏰ Não deixe para depois: " + n, "🔥 Aproveite já: " + n, "⚠️ Não perca: " + n, "🚨 Atenção! " + n, "⏳ Resolva hoje: " + n, "📣 " + n + ": fale connosco agora"],
+  }[c.tom] || [];
+  const fins = [tp[2] + ".", tp[2] + " e fale connosco!", "Mande mensagem e respondemos já.", 'Envie "Quero" e atendemos já.', "Fale connosco agora.", "Tire as suas dúvidas por mensagem."];
+  const usados = c.texts.map((t) => t.text);
+  let livres = ab.map((o, i) => ({ o: o, i: i })).filter((x) => !usados.some((u) => u.indexOf(x.o) === 0));
+  if (livres.length < 4) livres = ab.map((o, i) => ({ o: o, i: i }));
+  const bullets = d.split(/[.;\n]+/).map((s) => s.trim()).filter((s) => s.length > 2);
+  return livres.slice(0, 4).map((x, k) => {
+    const corpo = x.i % 2 === 1 && bullets.length > 1 ? bullets.map((b) => "✔️ " + b).join("\n") : d;
+    return [x.o, corpo, pr, p, fins[(x.i + k) % fins.length]].filter(Boolean).join("\n\n");
+  });
+}
+
+/* ===== vistas ===== */
+const fld = (label, inner) => '<label class="fl"><span>' + label + "</span>" + inner + "</label>";
+const inp = (k, f, v, id, ph, type) => '<input class="in" data-k="' + k + '" data-f="' + f + '" data-id="' + (id || "") + '" value="' + esc(v) + '" placeholder="' + esc(ph || "") + '" type="' + (type || "text") + '">';
+const tar = (k, f, v, id, ph, h) => '<textarea class="in" style="min-height:' + (h || 84) + 'px" data-k="' + k + '" data-f="' + f + '" data-id="' + (id || "") + '" placeholder="' + esc(ph || "") + '">' + esc(v) + "</textarea>";
+const chip = (act, label, on, data) => '<button class="chip' + (on ? " on" : "") + '" data-act="' + act + '" ' + (data || "") + ">" + label + "</button>";
+const dayChips = (act, sel, extra) => '<div class="chips">' + DIAS.map((d, i) => chip(act, d, sel.indexOf(i) > -1, 'data-v="' + i + '" ' + (extra || ""))).join("") + "</div>";
+const empty = (t, s, btn) => '<div class="card empty"><b>' + t + "</b>" + s + (btn ? '<div style="margin-top:12px">' + btn + "</div>" : "") + "</div>";
+const warn = (t) => '<div class="warn">' + ic("Warn", 18) + "<span>" + t + "</span></div>";
+const dueCount = () => S.items.filter((i) => i.status === "pendente" && new Date(i.when).getTime() <= Date.now()).length;
+
+function vPost(it) {
+  const g = G(it.groupId), c = C(it.campaignId), d = new Date(it.when);
+  const diff = Math.round((d.getTime() - Date.now()) / 60000);
+  const late = diff < -60, due = diff <= 0;
+  const label = late ? "Atrasada" : due ? "Publicar agora" : diff >= 60 ? "Em " + Math.floor(diff / 60) + " h" : "Em " + diff + " min";
+  const open = g && g.url
+    ? '<a class="btn p" href="' + esc(normUrl(g.url)) + '" target="_blank" rel="noopener noreferrer" data-act="copyopen" data-id="' + it.id + '">' + ic("Ext", 18) + "Copiar e abrir grupo</a>"
+    : '<button class="btn p" data-act="copyonly" data-id="' + it.id + '">' + ic("Copy", 18) + "Copiar texto</button>";
+  return '<div class="post ' + (late ? "late" : due ? "due" : "") + '"><div class="hr">' + fmtTime(d) + "<small>" + (dayKey(d) === dayKey(new Date()) ? "hoje" : fmtDay(d)) + "</small></div><div>" +
+    '<div class="row sp"><b>' + esc(g ? g.nome : "Grupo removido") + '</b><span class="tag ' + (late ? "r" : "s") + '">' + label + "</span></div>" +
+    (c ? '<div class="mute">' + esc(c.nome) + "</div>" : "") +
+    (g && g.regras ? '<div class="mute" style="margin-top:4px">Regra: ' + esc(g.regras) + "</div>" : "") +
+    '<div class="pv" data-act="expand">' + esc(it.text) + "</div>" +
+    '<div class="row wrapx">' + open + '<button class="btn ok" data-act="done" data-id="' + it.id + '">' + ic("Check", 18) + "Feito</button></div>" +
+    '<div class="row" style="margin-top:8px"><button class="btn sm" data-act="snooze" data-id="' + it.id + '">' + ic("Clock", 15) + '+1 hora</button><button class="btn sm" data-act="skip" data-id="' + it.id + '">Ignorar</button></div></div></div>';
+}
+
+function vHoje() {
+  const tk = dayKey(new Date());
+  const due = S.items.filter((i) => i.status === "pendente" && dayKey(new Date(i.when)) <= tk).sort(byWhen);
+  const feitas = S.items.filter((i) => i.status === "publicado" && i.postedAt && dayKey(new Date(i.postedAt)) === tk).length;
+  const prox = S.items.filter((i) => i.status === "pendente" && dayKey(new Date(i.when)) > tk).sort(byWhen).slice(0, 4);
+  const atr = due.filter((i) => new Date(i.when).getTime() < Date.now() - 3600000).length;
+  let h = '<div class="stats"><div class="stat"><b>' + due.length + "</b><span>Por publicar</span></div><div class=\"stat\"><b>" + feitas + "</b><span>Publicadas hoje</span></div><div class=\"stat\"><b>" + atr + "</b><span>Atrasadas</span></div></div>";
+  if (!due.length) h += empty("Nada para publicar agora", S.items.length ? "Tudo em dia. As próximas aparecem abaixo." : "Cria um anúncio e programa as publicações para os teus grupos.", '<button class="btn p" data-act="tab" data-v="criar">' + ic("Sparkles", 18) + "Criar anúncio</button>");
+  h += due.map(vPost).join("");
+  if (prox.length) {
+    h += '<div class="sec">Próximas</div>' + prox.map((it) => {
+      const g = G(it.groupId), c = C(it.campaignId), d = new Date(it.when);
+      return '<div class="card row sp" style="padding:12px"><div><b>' + esc(g ? g.nome : "Grupo removido") + '</b><div class="mute">' + esc(c ? c.nome : "") + '</div></div><span class="tag">' + fmtDay(d) + " · " + fmtTime(d) + "</span></div>";
+    }).join("");
+  }
+  return h;
+}
+
+function vCriar() {
+  const c = C(ui.sel);
+  let h = '<div class="chips" style="margin-bottom:12px"><button class="chip sun" data-act="novac">+ Nova campanha</button>' +
+    S.campaigns.map((x) => chip("selc", esc(x.nome || "Sem nome"), x.id === ui.sel, 'data-id="' + x.id + '"')).join("") + "</div>";
+  if (!c) return h + empty("Começa por uma campanha", "Uma campanha é o produto ou serviço que queres vender nos grupos.", '<button class="btn p" data-act="novac">' + ic("Plus", 18) + "Nova campanha</button>");
+  h += '<div class="card">' +
+    fld("O que vendes?", inp("c", "nome", c.nome, "", "Ex.: Croquis de localização")) +
+    fld("Tipo", '<select class="in" data-k="c" data-f="tipo">' + TIPOS.map((t) => '<option value="' + t[0] + '"' + (t[0] === c.tipo ? " selected" : "") + ">" + t[1] + "</option>").join("") + "</select>") +
+    fld("Detalhes e vantagens", tar("c", "descricao", c.descricao, "", "Ex.: Entrega em 24h. Documento com GPS. Aceito em licenças e registo.")) +
+    '<div class="row"><div style="flex:1">' + fld("Preço", inp("c", "preco", c.preco, "", "Ex.: 15.000 Kz")) + '</div><div style="flex:1">' + fld("Promoção", inp("c", "promo", c.promo, "", "Ex.: -10% esta semana")) + "</div></div>" +
+    fld("Tom do texto", '<div class="chips">' + TONS.map((t, i) => chip("tom", t, c.tom === t, 'data-v="' + i + '"')).join("") + "</div>") +
+    '<div class="chips" style="margin-bottom:12px">' + chip("tgl", "Link do WhatsApp no fim", c.incWpp !== false, 'data-f="incWpp"') + chip("tgl", "Cidade no fim", !!c.incCidade, 'data-f="incCidade"') + "</div>" +
+    (!S.settings.whatsapp && c.incWpp !== false ? warn("Falta o teu número de WhatsApp. Toca na engrenagem no topo para o adicionar.") : "") +
+    '<button class="btn p full" data-act="gerar">' + ic("Sparkles", 18) + (c.texts.length ? "Gerar mais variações" : "Gerar textos de venda") + "</button></div>";
+  if (c.texts.length) {
+    h += '<div class="sec">Textos (' + c.texts.length + "). Edita à vontade.</div>" + c.texts.map((t, i) =>
+      '<div class="card"><div class="row sp" style="margin-bottom:6px"><span class="tag">Variação ' + (c.texts.length - i) + '</span><div class="row"><button class="btn sm" data-act="copyt" data-id="' + t.id + '">' + ic("Copy", 15) + 'Copiar</button><button class="btn sm" data-act="delt" data-id="' + t.id + '" aria-label="Apagar texto">' + ic("Trash", 15) + "</button></div></div>" +
+      tar("t", "text", t.text, t.id, "", 150) + "</div>").join("") +
+      '<button class="btn d full" data-act="prog">' + ic("Cal", 18) + "Programar publicações</button>";
+  }
+  h += vFlyer(c);
+  h += '<div style="margin-top:16px"><button class="btn sm" data-act="delc">' + ic("Trash", 15) + "Apagar esta campanha</button></div>";
+  return h;
+}
+
+function vFlyer(c) {
+  let h = '<div class="card" style="margin-top:12px"><div class="row sp"><h3 style="margin:0">Imagem para o anúncio</h3><button class="btn sm" data-act="fly">' + ic("Img", 16) + (ui.flyOpen ? "Fechar" : "Criar imagem") + '</button></div><div class="mute" style="margin-top:4px">Publicações com imagem chamam mais atenção nos grupos.</div>';
+  if (ui.flyOpen) {
+    h += '<div style="margin-top:12px">' + fld("Título", inp("fly", "titulo", ui.fly.titulo, "", c.nome)) + fld("Linha de destaque", inp("fly", "sub", ui.fly.sub, "", c.promo || "Ex.: Entrega em 24h")) + fld("Preço", inp("fly", "preco", ui.fly.preco, "", c.preco)) +
+      '<div class="chips" style="margin-bottom:12px">' + THEMES.map((t, i) => chip("flytema", t.n, ui.fly.tema === i, 'data-v="' + i + '"')).join("") + "</div>" +
+      '<img id="flyimg" class="fly" alt="Pré-visualização da imagem do anúncio"><div class="mute" style="margin:6px 0 10px">No telemóvel, mantém o dedo na imagem para a guardar.</div>' +
+      '<a id="flydl" class="btn d full" download="anuncio.png" href="#">' + ic("Down", 18) + "Descarregar imagem</a></div>";
+  }
+  return h + "</div>";
+}
+
+function wrapText(ctx, text, maxW) {
+  const words = String(text).split(/\s+/).filter(Boolean), lines = [];
+  let cur = "";
+  words.forEach((w) => { const t = cur ? cur + " " + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function drawFlyer() {
+  const img = $("#flyimg"), c = C(ui.sel);
+  if (!img || !c) return;
+  const f = ui.fly, T = THEMES[f.tema], s = S.settings;
+  const titulo = f.titulo || c.nome || "O teu anúncio", sub = f.sub || c.promo || "", preco = f.preco || c.preco || "";
+  const cv = document.createElement("canvas");
+  cv.width = 1080; cv.height = 1080;
+  const x = cv.getContext("2d"), font = "system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+  x.fillStyle = T.bg; x.fillRect(0, 0, 1080, 1080);
+  x.fillStyle = T.ac; x.fillRect(0, 0, 1080, 26);
+  x.fillStyle = T.fg; x.textBaseline = "top";
+  x.font = "700 40px " + font; x.fillText((s.negocio || "").toUpperCase().slice(0, 34), 80, 90);
+  const size = titulo.length > 40 ? 78 : titulo.length > 22 ? 96 : 120;
+  x.font = "800 " + size + "px " + font;
+  let y = 200;
+  wrapText(x, titulo, 920).slice(0, 4).forEach((l) => { x.fillText(l, 80, y); y += size * 1.1; });
+  y += 24;
+  if (sub) { x.fillStyle = T.ac; x.font = "700 54px " + font; wrapText(x, sub, 920).slice(0, 2).forEach((l) => { x.fillText(l, 80, y); y += 66; }); y += 20; }
+  if (preco) {
+    x.font = "800 84px " + font;
+    const w = Math.min(x.measureText(preco).width + 80, 920);
+    x.fillStyle = T.ac;
+    if (x.roundRect) { x.beginPath(); x.roundRect(80, y, w, 130, 24); x.fill(); } else x.fillRect(80, y, w, 130);
+    x.fillStyle = T.acfg; x.fillText(preco, 120, y + 22);
+  }
+  x.fillStyle = "rgba(255,255,255,.12)"; x.fillRect(0, 900, 1080, 180);
+  x.fillStyle = T.fg; x.font = "800 58px " + font;
+  x.fillText(s.whatsapp ? "WhatsApp " + s.whatsapp : "Fale connosco", 80, 930);
+  x.font = "600 38px " + font; x.fillText(s.cidade ? "📍 " + s.cidade : "", 80, 1005);
+  const url = cv.toDataURL("image/png");
+  img.src = url;
+  const a = $("#flydl"); if (a) a.href = url;
+}
+
+function vGrupos() {
+  let h = '<div class="row" style="margin-bottom:12px"><button class="btn p" style="flex:1" data-act="novog">' + ic("Plus", 18) + 'Novo grupo</button><button class="btn" style="flex:1" data-act="bulk">Adicionar vários</button></div>';
+  if (ui.bulk) h += '<div class="card"><div class="mute" style="margin-bottom:6px">Uma linha por grupo: Nome | link</div><textarea id="bulktxt" class="in" style="min-height:130px" placeholder="Vendas Luanda | https://facebook.com/groups/vendasluanda"></textarea><button class="btn d full" style="margin-top:8px" data-act="bulkok">Adicionar à lista</button></div>';
+  if (!S.groups.length && !ui.bulk) h += empty("Sem grupos ainda", "Adiciona os grupos do Facebook onde queres publicar (até 20 de cada vez).");
+  S.groups.forEach((g) => {
+    const pub = S.items.filter((i) => i.groupId === g.id && i.status === "publicado");
+    const last = pub.map((i) => i.postedAt || i.when).sort().pop();
+    const open = ui.editG === g.id;
+    h += '<div class="card" style="opacity:' + (g.ativo === false ? 0.6 : 1) + '"><div class="row sp"><div style="min-width:0"><b>' + esc(g.nome || "Grupo sem nome") + '</b><div class="mute">' + pub.length + " publicadas" + (last ? " · última " + fmtDay(new Date(last)) : "") + '</div></div><button class="btn sm" data-act="gedit" data-id="' + g.id + '" aria-label="Editar grupo">' + ic("Pen", 15) + "</button></div>";
+    if (open) h += '<div style="margin-top:10px">' + fld("Nome do grupo", inp("g", "nome", g.nome, g.id)) + fld("Link do grupo", inp("g", "url", g.url, g.id, "https://facebook.com/groups/…")) + fld("Regras do grupo (opcional)", inp("g", "regras", g.regras, g.id, "Ex.: só 1 post por dia, sem preços")) +
+      fld("Dias permitidos (vazio = todos)", dayChips("gday", g.dias || [], 'data-id="' + g.id + '"')) +
+      '<div class="row" style="margin-top:6px"><button class="btn sm" data-act="gativo" data-id="' + g.id + '">' + (g.ativo === false ? "Ativar" : "Pausar grupo") + '</button><button class="btn sm" data-act="gdel" data-id="' + g.id + '">' + ic("Trash", 15) + "Apagar</button></div></div>";
+    h += "</div>";
+  });
+  return h;
+}
+
+function vAgenda() {
+  const list = S.items.filter((i) => ui.filtro === "todas" || (ui.filtro === "pendente" ? i.status === "pendente" : i.status === "publicado")).sort(byWhen);
+  const by = {};
+  list.forEach((i) => { const k = i.when.slice(0, 10); (by[k] = by[k] || []).push(i); });
+  const st = { pendente: ["s", "Pendente"], publicado: ["g", "Publicada"], ignorado: ["r", "Ignorada"] };
+  let h = '<div class="chips" style="margin-bottom:12px">' + [["pendente", "Pendentes"], ["publicado", "Publicadas"], ["todas", "Todas"]].map((x) => chip("filtro", x[1], ui.filtro === x[0], 'data-v="' + x[0] + '"')).join("") + "</div>";
+  if (!list.length) return h + empty("Sem publicações aqui", "Cria um anúncio e programa-o para aparecer na agenda.");
+  Object.keys(by).forEach((k) => {
+    h += '<div class="sec">' + fmtDay(new Date(k + "T00:00")) + "</div>";
+    by[k].forEach((i) => {
+      const g = G(i.groupId), c = C(i.campaignId), d = new Date(i.when);
+      h += '<div class="card" style="padding:12px"><div class="row sp"><div style="min-width:0"><b>' + fmtTime(d) + " · " + esc(g ? g.nome : "Grupo removido") + '</b><div class="mute">' + esc(c ? c.nome : "") + '</div></div><span class="tag ' + st[i.status][0] + '">' + st[i.status][1] + "</span></div>" +
+        (ui.editI === i.id ? '<div style="margin-top:8px">' + inp("i", "when", i.when, i.id, "", "datetime-local") + "</div>" : "") +
+        '<div class="row" style="margin-top:8px">' + (i.status === "pendente" ? '<button class="btn sm" data-act="iedit" data-id="' + i.id + '">' + ic("Clock", 15) + "Mudar hora</button>" : '<button class="btn sm" data-act="irepor" data-id="' + i.id + '">Repor</button>') +
+        '<button class="btn sm" data-act="idel" data-id="' + i.id + '" aria-label="Remover">' + ic("Trash", 15) + "</button></div></div>";
+    });
+  });
+  return h;
+}
+
+function cnt(label, i, f) {
+  return '<div class="row sp" style="margin-bottom:8px"><span>' + label + '</span><div class="cnt"><button data-act="cnt" data-id="' + i.id + '" data-f="' + f + '" data-d="-1" aria-label="Menos ' + label + '">' + ic("Minus", 16) + "</button><b>" + (i[f] || 0) + '</b><button data-act="cnt" data-id="' + i.id + '" data-f="' + f + '" data-d="1" aria-label="Mais ' + label + '">' + ic("Plus", 16) + "</button></div></div>";
+}
+
+function vResult() {
+  const pub = S.items.filter((i) => i.status === "publicado");
+  if (!pub.length) return empty("Ainda sem resultados", "Quando marcares publicações como feitas, regista aqui quantas pessoas te contactaram e quantas compraram.");
+  const sum = (a, f) => a.reduce((t, i) => t + (i[f] || 0), 0);
+  const rank = S.groups.map((g) => { const a = pub.filter((i) => i.groupId === g.id); return { g: g, n: a.length, l: sum(a, "leads"), v: sum(a, "vendas") }; }).filter((r) => r.n > 0).sort((a, b) => b.v - a.v || b.l - a.l);
+  const maxL = Math.max.apply(null, [1].concat(rank.map((r) => r.l)));
+  const horas = {};
+  pub.forEach((i) => { const h = i.when.slice(11, 13); horas[h] = (horas[h] || 0) + (i.leads || 0); });
+  const topH = Object.keys(horas).filter((k) => horas[k] > 0).sort((a, b) => horas[b] - horas[a]).slice(0, 3);
+  let h = '<div class="stats"><div class="stat"><b>' + pub.length + "</b><span>Publicadas</span></div><div class=\"stat\"><b>" + sum(pub, "leads") + "</b><span>Contactos</span></div><div class=\"stat\"><b>" + sum(pub, "vendas") + "</b><span>Vendas</span></div></div>";
+  if (rank.length) h += '<div class="sec">Melhores grupos</div><div class="card">' + rank.slice(0, 8).map((r) => '<div style="margin-bottom:12px"><div class="row sp"><b>' + esc(r.g.nome) + '</b><span class="mute">' + r.l + " contactos · " + r.v + " vendas · " + r.n + ' posts</span></div><div class="bar"><i style="width:' + (r.l / maxL) * 100 + '%"></i></div></div>').join("") + "</div>";
+  if (topH.length) h += '<div class="card"><h3>Melhores horas</h3><div class="chips">' + topH.map((k) => '<span class="tag g">' + k + "h · " + horas[k] + " contactos</span>").join("") + "</div></div>";
+  h += '<div class="sec">Registar resultados</div>' + pub.slice().sort((a, b) => ((b.postedAt || b.when) < (a.postedAt || a.when) ? -1 : 1)).slice(0, 12).map((i) => {
+    const g = G(i.groupId), c = C(i.campaignId);
+    return '<div class="card" style="padding:12px"><b>' + esc(g ? g.nome : "Grupo removido") + '</b><div class="mute" style="margin-bottom:8px">' + esc(c ? c.nome : "") + " · " + fmtDay(new Date(i.when)) + " " + i.when.slice(11, 16) + "</div>" + cnt("Contactos", i, "leads") + cnt("Vendas", i, "vendas") + "</div>";
+  }).join("");
+  return h;
+}
+
+/* ===== janelas (sheets) ===== */
+const sheet = (title, body) => '<div class="ov" data-act="closeov"><div class="sheet" role="dialog" aria-label="' + esc(title) + '"><div class="sh-h"><b>' + title + '</b><button class="ic" data-act="closesheet" aria-label="Fechar">' + ic("X") + '</button></div><div class="sh-b">' + body + "</div></div></div>";
+
+function progDefaults(c) {
+  return { selG: [], data: dayKey(new Date(Date.now() + (new Date().getHours() >= 20 ? 864e5 : 0))), hora: "12:30", gap: 15, vary: true, textId: c.texts[0] ? c.texts[0].id : "", repeat: false, weeks: 2, days: [1, 3, 5] };
+}
+function progDates(p) {
+  const start = new Date(p.data + "T00:00");
+  if (isNaN(start.getTime())) return [];
+  if (!p.repeat) return [start];
+  const out = [];
+  for (let i = 0; i < p.weeks * 7; i++) { const d = new Date(start); d.setDate(start.getDate() + i); if (p.days.indexOf(d.getDay()) > -1) out.push(d); }
+  return out;
+}
+function progWarns(p, dates) {
+  const w = [];
+  if (!dates.length) return w;
+  const cd = (S.settings.cooldownDias || 3) * 864e5;
+  p.selG.forEach((id) => {
+    const g = G(id); if (!g) return;
+    const rec = S.items.find((i) => i.groupId === id && i.status !== "ignorado" && Math.abs(new Date(i.when).getTime() - dates[0].getTime()) < cd);
+    if (rec) w.push(esc(g.nome) + ": já tem publicação perto desta data (" + fmtDay(new Date(rec.when)) + ").");
+    if (g.dias && g.dias.length && dates.some((d) => g.dias.indexOf(d.getDay()) < 0)) w.push(esc(g.nome) + ": só permite publicar em " + g.dias.map((x) => DIAS[x]).join(", ") + ".");
+  });
+  return w;
+}
+
+function sProg() {
+  const c = C(ui.sel), p = ui.prog, groups = S.groups.filter((g) => g.ativo !== false);
+  if (!groups.length) return sheet("Programar publicações", empty("Ainda não tens grupos", "Adiciona os teus grupos no separador Grupos."));
+  const dates = progDates(p), total = p.selG.length * dates.length;
+  let b = '<div class="row sp" style="margin-bottom:8px"><b>Grupos (' + p.selG.length + '/20)</b><button class="btn sm" data-act="pall">' + (p.selG.length ? "Limpar" : "Selecionar todos") + "</button></div>" +
+    groups.map((g) => '<button class="gsel' + (p.selG.indexOf(g.id) > -1 ? " on" : "") + '" data-act="pg" data-id="' + g.id + '"><span class="box">' + (p.selG.indexOf(g.id) > -1 ? ic("Check", 14) : "") + "</span><span>" + esc(g.nome) + "</span></button>").join("") +
+    '<div class="sec">Quando</div><div class="row"><div style="flex:1">' + fld("Data", inp("p", "data", p.data, "", "", "date")) + '</div><div style="flex:1">' + fld("Hora do 1.º grupo", inp("p", "hora", p.hora, "", "", "time")) + "</div></div>" +
+    '<div class="chips" style="margin-bottom:12px">' + HORAS.map((h) => chip("phora", h, p.hora === h, 'data-v="' + h + '"')).join("") + "</div>" +
+    fld("Intervalo entre grupos (evita bloqueios)", '<div class="chips">' + [10, 15, 20, 30].map((m) => chip("pgap", m + " min", p.gap === m, 'data-v="' + m + '"')).join("") + "</div>") +
+    '<div class="chips" style="margin-bottom:10px">' + chip("prepeat", "Repetir toda a semana", p.repeat) + "</div>" +
+    (p.repeat ? fld("Dias da semana", dayChips("pday", p.days)) + fld("Durante quantas semanas?", '<div class="chips">' + [1, 2, 3, 4, 8].map((w) => chip("pweeks", String(w), p.weeks === w, 'data-v="' + w + '"')).join("") + "</div>") : "") +
+    '<div class="sec">Texto</div><div class="chips" style="margin-bottom:10px">' + chip("pvary", "Variar por grupo", p.vary, 'data-v="1"') + chip("pvary", "Sempre o mesmo", !p.vary, 'data-v="0"') + "</div>" +
+    (!p.vary ? '<select class="in" data-k="p" data-f="textId" style="margin-bottom:10px">' + c.texts.map((t) => '<option value="' + t.id + '"' + (t.id === p.textId ? " selected" : "") + ">" + esc(t.text.slice(0, 50)) + "…</option>").join("") + "</select>" : "") +
+    progWarns(p, dates).map(warn).join("") +
+    '<button class="btn p full" style="margin-top:8px"' + (total === 0 ? " disabled" : "") + ' data-act="agendar">' + ic("Cal", 18) + "Agendar " + total + " publicações</button>";
+  return sheet("Programar publicações", b);
+}
+
+function sSettings() {
+  const s = S.settings;
+  return sheet("Definições",
+    '<div class="card">' + fld("Nome do teu negócio", inp("s", "negocio", s.negocio)) + fld("WhatsApp (aparece nos anúncios)", inp("s", "whatsapp", s.whatsapp, "", "9XX XXX XXX", "tel")) + fld("Cidade", inp("s", "cidade", s.cidade)) +
+    fld("Dias mínimos entre posts no mesmo grupo", '<div class="chips">' + [1, 2, 3, 5, 7].map((d) => chip("cool", String(d), s.cooldownDias === d, 'data-v="' + d + '"')).join("") + "</div>") + "</div>" +
+    '<div class="card"><h3>Cópia de segurança</h3><div class="mute" style="margin-bottom:8px">Copia e guarda este texto (por exemplo, envia para ti no WhatsApp). Serve para recuperar tudo noutro telemóvel.</div><button class="btn full" data-act="backup">' + ic("Copy", 18) + 'Copiar dados</button><textarea id="imp" class="in" style="margin-top:10px" placeholder="Cola aqui uma cópia para restaurar"></textarea><button class="btn d full" style="margin-top:8px" data-act="restaurar">Restaurar</button></div>' +
+    '<button class="btn full" data-act="reset">' + ic("Trash", 18) + (ui.reset ? "Toca outra vez para apagar tudo" : "Apagar todos os dados") + "</button>");
+}
+
+/* ===== desenhar ===== */
+function render() {
+  const y = window.scrollY || 0;
+  const T = { hoje: ["Hoje", fmtDay(new Date())], criar: ["Criar anúncios", "Textos e imagem prontos para vender"], grupos: ["Grupos", S.groups.length + " grupo(s) guardado(s)"], agenda: ["Agenda", "Tudo o que está programado"], result: ["Resultados", "O que está a dar clientes"] }[ui.tab];
+  const view = { hoje: vHoje, criar: vCriar, grupos: vGrupos, agenda: vAgenda, result: vResult }[ui.tab]();
+  const dc = dueCount();
+  const nav = [["hoje", "Hoje", "Send"], ["criar", "Criar", "Sparkles"], ["grupos", "Grupos", "Users"], ["agenda", "Agenda", "Cal"], ["result", "Resultados", "Chart"]].map((t) =>
+    '<button class="tab' + (ui.tab === t[0] ? " on" : "") + '" data-act="tab" data-v="' + t[0] + '">' + ic(t[2], 22) + t[1] + (t[0] === "hoje" && dc > 0 ? '<span class="badge">' + dc + "</span>" : "") + "</button>").join("");
+  $("#app").innerHTML = '<header class="top"><div><h1>' + T[0] + "</h1><p>" + T[1] + '</p></div><button class="ic" data-act="settings" aria-label="Definições">' + ic("Gear") + '</button></header><main class="wrap">' + view + '</main><nav class="tabs" aria-label="Navegação">' + nav + "</nav>";
+  window.scrollTo(0, y);
+  if (ui.tab === "criar" && ui.flyOpen) drawFlyer();
+}
+
+function renderSheet(fresh) {
+  const box = $("#sheet"), old = box.querySelector(".sh-b"), st = old && !fresh ? old.scrollTop : 0;
+  if (!ui.sheet) { box.innerHTML = ""; document.body.style.overflow = ""; return; }
+  box.innerHTML = ui.sheet === "prog" ? sProg() : sSettings();
+  document.body.style.overflow = "hidden";
+  const nb = box.querySelector(".sh-b"); if (nb) nb.scrollTop = st;
+}
+
+let toastT;
+function toast(m) {
+  const t = $("#toast"); t.textContent = m; t.style.display = "block";
+  clearTimeout(toastT); toastT = setTimeout(() => { t.style.display = "none"; }, 2600);
+}
+const closeSheet = () => { ui.sheet = null; ui.reset = false; renderSheet(); };
+const setItem = (id, p) => { const i = I(id); if (i) Object.assign(i, p); save(); };
+
+/* ===== ações ===== */
+const A = {
+  tab: (d) => { ui.tab = d.v; window.scrollTo(0, 0); render(); },
+  settings: () => { ui.sheet = "settings"; renderSheet(true); },
+  closesheet: closeSheet,
+  closeov: (d, el, e) => { if (e.target === el) closeSheet(); },
+  expand: (d, el) => el.classList.toggle("open"),
+  copyopen: (d) => { const i = I(d.id); if (i) copyText(i.text).then((ok) => toast(ok ? "Texto copiado. Cola no grupo." : "Não consegui copiar. Copia o texto à mão.")); },
+  copyonly: (d) => { const i = I(d.id); if (i) copyText(i.text).then((ok) => toast(ok ? "Texto copiado. Este grupo não tem link: adiciona em Grupos." : "Não consegui copiar.")); },
+  done: (d) => { setItem(d.id, { status: "publicado", postedAt: new Date().toISOString() }); toast("Marcada como publicada."); render(); },
+  snooze: (d) => { const i = I(d.id); if (!i) return; setItem(d.id, { when: toISO(new Date(Math.max(Date.now(), new Date(i.when).getTime()) + 3600000)) }); toast("Adiada 1 hora."); render(); },
+  skip: (d) => { setItem(d.id, { status: "ignorado" }); toast("Publicação ignorada."); render(); },
+  /* criar */
+  novac: () => { const n = novaCampanha(); S.campaigns.unshift(n); ui.sel = n.id; save(); render(); },
+  selc: (d) => { ui.sel = d.id; ui.flyOpen = false; render(); },
+  delc: () => { const id = ui.sel; S.campaigns = S.campaigns.filter((x) => x.id !== id); S.items = S.items.filter((i) => i.campaignId !== id || i.status === "publicado"); ui.sel = S.campaigns[0] ? S.campaigns[0].id : null; save(); render(); },
+  tom: (d) => { const c = C(ui.sel); if (c) { c.tom = TONS[+d.v]; save(); render(); } },
+  tgl: (d) => { const c = C(ui.sel); if (c) { c[d.f] = d.f === "incWpp" ? c.incWpp === false : !c.incCidade; save(); render(); } },
+  gerar: () => {
+    const c = C(ui.sel);
+    if (!c.nome.trim()) { toast("Escreve o nome do produto ou serviço."); return; }
+    const foot = rodape(c);
+    gerarTextos(c).forEach((t) => c.texts.unshift({ id: uid(), text: t + foot }));
+    save(); render();
+    toast("Textos criados. Edita ou programa.");
+  },
+  copyt: (d) => { const c = C(ui.sel), t = c && c.texts.find((x) => x.id === d.id); if (t) copyText(t.text).then((ok) => toast(ok ? "Texto copiado." : "Não consegui copiar.")); },
+  delt: (d) => { const c = C(ui.sel); c.texts = c.texts.filter((x) => x.id !== d.id); save(); render(); },
+  fly: () => { ui.flyOpen = !ui.flyOpen; render(); },
+  flytema: (d) => { ui.fly.tema = +d.v; render(); },
+  /* programar */
+  prog: () => { const c = C(ui.sel); if (!c || !c.texts.length) { toast("Gera os textos primeiro."); return; } ui.prog = progDefaults(c); ui.sheet = "prog"; renderSheet(true); },
+  pg: (d) => { const p = ui.prog, i = p.selG.indexOf(d.id); if (i > -1) p.selG.splice(i, 1); else if (p.selG.length >= 20) { toast("Máximo de 20 grupos por programação."); return; } else p.selG.push(d.id); renderSheet(); },
+  pall: () => { const p = ui.prog; p.selG = p.selG.length ? [] : S.groups.filter((g) => g.ativo !== false).slice(0, 20).map((g) => g.id); renderSheet(); },
+  phora: (d) => { ui.prog.hora = d.v; renderSheet(); },
+  pgap: (d) => { ui.prog.gap = +d.v; renderSheet(); },
+  prepeat: () => { ui.prog.repeat = !ui.prog.repeat; renderSheet(); },
+  pweeks: (d) => { ui.prog.weeks = +d.v; renderSheet(); },
+  pday: (d) => { const a = ui.prog.days, i = a.indexOf(+d.v); if (i > -1) a.splice(i, 1); else a.push(+d.v); renderSheet(); },
+  pvary: (d) => { ui.prog.vary = d.v === "1"; renderSheet(); },
+  agendar: () => {
+    const c = C(ui.sel), p = ui.prog, dates = progDates(p), hm = p.hora.split(":").map(Number);
+    const sel = p.selG.map(G).filter(Boolean), out = [];
+    dates.forEach((d, di) => sel.forEach((g, gi) => {
+      const w = new Date(d); w.setHours(hm[0], hm[1] + gi * p.gap, 0, 0);
+      const t = p.vary ? c.texts[(gi + di) % c.texts.length] : c.texts.find((x) => x.id === p.textId) || c.texts[0];
+      out.push({ id: uid(), campaignId: c.id, groupId: g.id, text: t.text, when: toISO(w), status: "pendente", leads: 0, vendas: 0 });
+    }));
+    if (!out.length) return;
+    S.items = S.items.concat(out); save();
+    ui.sheet = null; renderSheet(); ui.tab = "agenda"; ui.filtro = "pendente"; window.scrollTo(0, 0); render();
+    toast(out.length + " publicações agendadas.");
+  },
+  /* grupos */
+  novog: () => { const g = { id: uid(), nome: "", url: "", regras: "", dias: [], ativo: true }; S.groups.unshift(g); ui.editG = g.id; save(); render(); },
+  bulk: () => { ui.bulk = !ui.bulk; render(); },
+  bulkok: () => {
+    const txt = ($("#bulktxt") || {}).value || "";
+    const isUrl = (v) => /^(https?:\/\/|(www\.)?facebook\.com|fb\.com)/i.test(v || "");
+    const novos = txt.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => {
+      const parts = l.split("|").map((x) => x.trim()), a = parts[0], b = parts[1];
+      const url = isUrl(b) ? b : isUrl(a) ? a : "";
+      return { id: uid(), nome: isUrl(a) ? "Grupo " + (a.split("/").filter(Boolean).pop() || "") : a, url: url, regras: "", dias: [], ativo: true };
+    });
+    if (!novos.length) { toast("Escreve pelo menos um grupo."); return; }
+    S.groups = novos.concat(S.groups); ui.bulk = false; save(); render();
+    toast(novos.length + " grupos adicionados.");
+  },
+  gedit: (d) => { ui.editG = ui.editG === d.id ? null : d.id; render(); },
+  gday: (d) => { const g = G(d.id); g.dias = g.dias || []; const i = g.dias.indexOf(+d.v); if (i > -1) g.dias.splice(i, 1); else g.dias.push(+d.v); save(); render(); },
+  gativo: (d) => { const g = G(d.id); g.ativo = g.ativo === false; save(); render(); },
+  gdel: (d) => { S.groups = S.groups.filter((g) => g.id !== d.id); S.items = S.items.filter((i) => i.groupId !== d.id || i.status === "publicado"); save(); render(); },
+  /* agenda e resultados */
+  filtro: (d) => { ui.filtro = d.v; render(); },
+  iedit: (d) => { ui.editI = ui.editI === d.id ? null : d.id; render(); },
+  irepor: (d) => { setItem(d.id, { status: "pendente" }); render(); },
+  idel: (d) => { S.items = S.items.filter((i) => i.id !== d.id); save(); toast("Removida da agenda."); render(); },
+  cnt: (d) => { const i = I(d.id); i[d.f] = Math.max(0, (i[d.f] || 0) + +d.d); save(); render(); },
+  /* definições */
+  cool: (d) => { S.settings.cooldownDias = +d.v; save(); renderSheet(); },
+  backup: () => copyText(JSON.stringify(S)).then((ok) => toast(ok ? "Cópia feita." : "Não consegui copiar.")),
+  restaurar: () => {
+    try {
+      const o = JSON.parse(($("#imp") || {}).value || "");
+      if (!o || !Array.isArray(o.items) || !Array.isArray(o.groups)) throw new Error("x");
+      S = Object.assign(initState(), o); S.settings = Object.assign(initState().settings, o.settings || {});
+      ui.sel = S.campaigns[0] ? S.campaigns[0].id : null; save(); closeSheet(); render(); toast("Dados restaurados.");
+    } catch (e) { toast("Texto inválido."); }
+  },
+  reset: () => { if (ui.reset) { S = initState(); ui.sel = null; ui.reset = false; save(); closeSheet(); render(); toast("Dados apagados."); } else { ui.reset = true; renderSheet(); } },
+};
+
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const fn = A[el.dataset.act];
+  if (fn) fn(el.dataset, el, e);
+});
+
+function onField(e) {
+  const el = e.target, k = el.dataset && el.dataset.k;
+  if (!k) return;
+  const f = el.dataset.f, id = el.dataset.id, v = el.value;
+  if (k === "c") { const o = C(ui.sel); if (o) o[f] = v; }
+  else if (k === "t") { const c = C(ui.sel), t = c && c.texts.find((x) => x.id === id); if (t) t.text = v; }
+  else if (k === "g") { const o = G(id); if (o) o[f] = v; }
+  else if (k === "s") S.settings[f] = v;
+  else if (k === "i") { const o = I(id); if (o && v) o[f] = v; }
+  else if (k === "p") { ui.prog[f] = v; if (e.type === "change" && (f === "data" || f === "hora")) renderSheet(); }
+  else if (k === "fly") { ui.fly[f] = v; drawFlyer(); return; }
+  save();
+}
+document.addEventListener("input", onField);
+document.addEventListener("change", onField);
+
+setInterval(() => {
+  const a = document.activeElement;
+  if (ui.tab === "hoje" && !ui.sheet && !(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) render();
+}, 30000);
+
+render();
+</script>
+</body>
+</html>
