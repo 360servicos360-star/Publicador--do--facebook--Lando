@@ -1,1 +1,0 @@
-# Publicador--do--facebook--Lando
